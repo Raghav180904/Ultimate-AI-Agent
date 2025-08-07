@@ -1,0 +1,206 @@
+{
+  "name": "content agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to search the internet",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"api_key\": \"your-api-key\",\n    \"query\": \"{searchTerm}\",\n    \"search_depth\": \"basic\",\n    \"include_answer\": true,\n    \"topic\": \"news\",\n    \"include_raw_content\": true,\n    \"max_results\": 3\n} ",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "searchTerm",
+              "description": "What the user has requested to write a blog about",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        624
+      ],
+      "id": "fcee521e-89c3-4902-8788-732ed2852a95",
+      "name": "Tavily"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query}}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are a skilled AI blog writer specializing in engaging, well-structured, and informative content. Your writing style is clear, compelling, and tailored to the target audience. You optimize for readability, SEO, and value, ensuring blogs are well-researched, original, and free of fluff.\n\n## Tools\nTavily - Use this to search the web about the requested topic for the blog post.\n\n## Blog Requirements\nFormat all blog content in HTML, using proper headings (<h1>, <h2>), paragraphs (<p>), bullet points (<ul><li>), and links (<a href=\"URL\">) for citations. All citations from the Tavily tool must be preserved, with clickable hyperlinks so readers can access the original sources.\n\nMaintain a natural, human-like tone, use varied sentence structures, and include relevant examples or data when needed. Structure content for easy reading with concise paragraphs and logical flow. Always ensure factual accuracy and align the tone with the intended brand or purpose.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        448,
+        352
+      ],
+      "id": "1cee5b30-71c2-4565-bed1-f5b0856266a4",
+      "name": "Content Creator Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14d9076e-27ea-4846-8b44-f83cf4022b9e",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        256
+      ],
+      "id": "a08b1f88-1499-4942-8ad5-297a68873e50",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f2a8ff2d-6b59-4ad6-a2e7-8705354f4105",
+              "name": "response",
+              "value": "Error occurred. Please try again.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        432
+      ],
+      "id": "df4364ce-9687-4900-a107-1896d22ec0a7",
+      "name": "Try Again"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        656
+      ],
+      "id": "6a2d555d-98f5-4e1e-9356-6d8f6aed1ac7",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "WKD9olDH0EIKUgw8",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "Brawlhalla: A Comprehensive Overview\n\nBrawlhalla is a free-to-play platform fighting game developed by Blue Mammoth Games. It has quickly gained a large following due to its engaging multiplayer gameplay and vibrant character roster. In this blog, we will explore the key features, gameplay mechanics, and community aspects of Brawlhalla.\n\n**Game Mechanics and Features**\nBrawlhalla stands out with its unique gameplay mechanics that differentiate it from other fighting games. Players choose from a diverse array of characters, known as Legends, each with unique abilities and weapons. This variety allows for different play styles, whether you prefer to fight from a distance or engage in close combat.\n\nThe game is set in a colorful, 2D world filled with dynamic platforms. The objective is to knock your opponents off the stage using a combination of strategic attacks, dodging, and signature moves. With a simple control scheme, Brawlhalla is accessible to both casual and competitive players alike.\n\n**Cross-Platform Play**\nOne of the game's significant advantages is its cross-platform compatibility. Players can compete against others on various platforms, including PC, PlayStation, Xbox, and Nintendo Switch. This feature not only expands the player base but also creates a vibrant community of fighters eager to face off against each other.\n\n**Competitive Scene**\nBrawlhalla has a thriving esports scene, with regular tournaments hosted both online and offline. Events like the Brawlhalla World Championship attract top players from around the globe, showcasing their skills in intense matches. The competitive nature of the game encourages players to improve and refine their techniques, making it an exciting environment for fans of esports.\n\n**Community and Updates**\nThe Brawlhalla community is passionate and actively engages with the developers, providing feedback and suggestions for game updates. Blue Mammoth Games regularly releases new content, including Legends, skins, and game modes, keeping the experience fresh and exciting.\n\n**Conclusion**\nBrawlhalla offers an exhilarating fighting experience with its unique gameplay mechanics, diverse character roster, and strong community support. Whether you're a competitive player looking to hone your skills or a casual gamer wanting to have fun with friends, Brawlhalla provides an entertaining adventure for all. Jump into the arena and discover why Brawlhalla has become a favorite in the world of platform fighting games!"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Content Creator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Creator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Creator Agent": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Creator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bb17f860-a101-4212-a090-a0c3a050d39d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50838b8f02bfcf1118f6c654fadae981902f3ddbab30abe0904e5dc2a97231b2"
+  },
+  "id": "Hvcv7owJwjH7W0CG",
+  "tags": []
+}
